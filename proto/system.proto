@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+package system;
+
+option go_package = "./proto";
+
+// SystemInfo服务定义
+service SystemInfoService {
+  // 客户端注册到服务端
+  rpc Register(RegisterRequest) returns (RegisterResponse) {}
+
+  // 客户端发送系统信息到服务端
+  rpc SendSystemInfo(SystemInfoRequest) returns (SystemInfoResponse) {}
+
+  // 服务端向客户端发送命令
+  rpc ReceiveCommands(CommandRequest) returns (stream Command) {}
+
+  // 客户端向服务端报告命令执行结果
+  rpc ReportCommandResult(CommandResult) returns (CommandResultResponse) {}
+}
+
+// 注册请求
+message RegisterRequest {
+  string hostname = 1;
+  string ip_address = 2;
+  string mac_address = 3;
+  string os_info = 4;
+}
+
+// 注册响应
+message RegisterResponse {
+  string client_id = 1; // 服务端生成的唯一标识符
+  bool success = 2;
+  string message = 3;
+}
+
+// 系统信息请求
+message SystemInfoRequest {
+  string client_id = 1;
+  SystemInfo system_info = 2;
+  int64 timestamp = 3;
+}
+
+// 系统信息
+message SystemInfo {
+  CPUInfo cpu_info = 1;
+  MemoryInfo memory_info = 2;
+  DiskInfo disk_info = 3;
+  NetworkInfo network_info = 4;
+  map<string, string> custom_metrics = 5;
+}
+
+// CPU信息
+message CPUInfo {
+  double cpu_usage_percent = 1;
+  int32 cpu_cores = 2;
+  repeated double core_usage_percents = 3;
+  int64 load_average_1m = 4;
+  int64 load_average_5m = 5;
+  int64 load_average_15m = 6;
+}
+
+// 内存信息
+message MemoryInfo {
+  int64 total_memory = 1;
+  int64 used_memory = 2;
+  int64 free_memory = 3;
+  double memory_usage_percent = 4;
+  int64 swap_total = 5;
+  int64 swap_used = 6;
+  int64 swap_free = 7;
+}
+
+// 磁盘信息
+message DiskInfo {
+  repeated DiskPartition partitions = 1;
+  int64 disk_reads = 2;
+  int64 disk_writes = 3;
+}
+
+// 磁盘分区信息
+message DiskPartition {
+  string mount_point = 1;
+  string filesystem = 2;
+  int64 total_space = 3;
+  int64 used_space = 4;
+  int64 free_space = 5;
+  double usage_percent = 6;
+}
+
+// 网络信息
+message NetworkInfo {
+  map<string, NetworkInterface> interfaces = 1;
+  int64 bytes_sent = 2;
+  int64 bytes_received = 3;
+  int64 packets_sent = 4;
+  int64 packets_received = 5;
+}
+
+// 网络接口信息
+message NetworkInterface {
+  string name = 1;
+  string ip_address = 2;
+  string mac_address = 3;
+  int64 bytes_sent = 4;
+  int64 bytes_received = 5;
+  bool is_up = 6;
+}
+
+// 系统信息响应
+message SystemInfoResponse {
+  bool received = 1;
+  string message = 2;
+}
+
+// 命令请求
+message CommandRequest {
+  string client_id = 1;
+}
+
+// 命令
+message Command {
+  string command_id = 1;
+  string command_type = 2;
+  string content = 3;
+  int32 timeout_seconds = 4;
+  int64 issued_at = 5;
+}
+
+// 命令执行结果
+message CommandResult {
+  string client_id = 1;
+  string command_id = 2;
+  bool success = 3;
+  string output = 4;
+  string error = 5;
+  int64 execution_time_ms = 6;
+  int64 completed_at = 7;
+}
+
+// 命令执行结果响应
+message CommandResultResponse {
+  bool received = 1;
+  string message = 2;
+}
