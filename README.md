@@ -57,6 +57,6 @@ $ ./gomonitor_server
 3.启动客户端
 
 ```bash
-./gomonitor_client --server=localhost:50025 --interval=60
+$ ./gomonitor_client --server=localhost:50025 --interval=60
 ```
 
